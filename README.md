@@ -15,6 +15,7 @@ Dependencies
 Todo
 ----
 
+- make user/pass optional in config file
 - test all protocols.
 
 Usage
