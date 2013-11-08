@@ -20,11 +20,11 @@ Todo
 Usage
 -----
 
-You have to create a config file called `.vim-transfer` in your project directory
-(see `vim-transfer.example`).
+You have to create a config file called `.vTransfer` in your project directory
+(see `vTransfer.example`).
 
 When uploading/downloading *vTransfer* searches backwards for a config file so if the
-edited file is e.g. `/test/dir/file.txt` and the config file is `/test/.vim-transfer`
+edited file is e.g. `/test/dir/file.txt` and the config file is `/test/.vTransfer`
 it will upload/download as `dir/file.txt`.
 
 This is an example config file, all options are mandatory:
