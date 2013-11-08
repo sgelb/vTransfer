@@ -55,13 +55,14 @@ endfunction
 function! h:TransferFile(actionType)
     let conf = h:GetConf()
 
-    if a:actionType ==# "put"
-        let action = printf('%s %s -o %s', a:actionType, conf['localpath'], conf['remotepath'])
-    elseif a:actionType ==# "get"
-        let action = printf('%s %s -o %s', a:actionType, conf['remotepath'], conf['localpath'])
-    endif
-
     if has_key(conf, 'host')
+
+        if a:actionType ==# "put"
+            let action = printf('%s %s -o %s', a:actionType, conf['localpath'], conf['remotepath'])
+        elseif a:actionType ==# "get"
+            let action = printf('%s %s -o %s', a:actionType, conf['remotepath'], conf['localpath'])
+        endif
+
         let cmd = printf('lftp -p %s -u %s,%s %s ', conf['port'], conf['user'], conf['pass'], conf['host']) 
         let cmd .= printf('-e "set ftp:passive-mode off;set xfer:clobber on;%s;quit;"', action)
 
