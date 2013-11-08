@@ -1,0 +1,8 @@
+protocol sftp
+host   1.1.1.1
+user   username
+pass   test123
+port   22
+remote /var/www/
+confirm_download 0
+confirm_upload 0
