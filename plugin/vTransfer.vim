@@ -7,6 +7,7 @@
 " License: MIT
 
 function! h:GetConf()
+    " read config file
     " The following function is
     " Copyright (C) Viktor Hesselbom (hesselbom.net)
     let conf = {}
@@ -54,18 +55,31 @@ endfunction
 
 function! h:TransferFile(actionType)
     let conf = h:GetConf()
+    
+    " ask for options if not in config file
+    let askForOptions = ['host', 'user', 'pass', 'port', 'remote',
+                         'confirm_download', 'confirm_upload', 
+                         'localpath', 'remotepath']
+    for opt in askForOptions
+        if !has_key(conf, opt)
+            let conf[opt] = input('Enter ' . opt . ': ')
+        endif
+    endfor
 
     if has_key(conf, 'host')
 
+        " create different actions for put and get
         if a:actionType ==# "put"
             let action = printf('%s %s -o %s', a:actionType, conf['localpath'], conf['remotepath'])
         elseif a:actionType ==# "get"
             let action = printf('%s %s -o %s', a:actionType, conf['remotepath'], conf['localpath'])
         endif
 
+        " create command
         let cmd = printf('lftp -p %s -u %s,%s %s ', conf['port'], conf['user'], conf['pass'], conf['host']) 
         let cmd .= printf('-e "set ftp:passive-mode off;set xfer:clobber on;%s;quit;"', action)
 
+        " confirm transfer if set in config
         if (a:actionType ==# "put") && (conf['confirm_upload'] ==# 1)
             let choice = confirm('Upload file?', "&Yes\n&No", 2)
         elseif (a:actionType ==# "get") && (conf['confirm_download'] ==# 1)
