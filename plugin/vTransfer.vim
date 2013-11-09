@@ -44,10 +44,7 @@ function! h:GetConf()
             let vvalue = substitute(i[stridx(i, ' '):], '^\s*\(.\{-}\)\s*$', '\1', '')
             let conf[vname] = vvalue
         endfor
-
-        let conf['local'] = fnamemodify(l:foundconfig, ':h:p') . '/'
-        let conf['localpath'] = expand('%:p')
-        let conf['remotepath'] = conf['remote'] . conf['localpath'][strlen(conf['local']):]
+        let conf['local_root'] = fnamemodify(l:foundconfig, ':h:p') . '/'
     endif
 
     return conf
@@ -56,18 +53,22 @@ endfunction
 function! h:TransferFile(actionType)
     let conf = h:GetConf()
     
-    " ask for options if not in config file
-    let askForOptions = ['host', 'user', 'pass', 'port', 'remote',
-                         'confirm_download', 'confirm_upload', 
-                         'localpath', 'remotepath']
+    " ask for missing options
+    let askForOptions = ['host', 'user', 'pass', 'port', 'local_root', 'remote_root']
+
     for opt in askForOptions
         if !has_key(conf, opt)
+            inputsave()
             let conf[opt] = input('Enter ' . opt . ': ')
+            inputrestore()
         endif
     endfor
 
-    if has_key(conf, 'host')
+    " create localpath and remotepath
+    let conf['localpath'] = expand('%:p')
+    let conf['remotepath'] = conf['remote_root'] . conf['localpath'][strlen(conf['local_root']):]
 
+    if has_key(conf, 'host')
         " create different actions for put and get
         if a:actionType ==# "put"
             let action = printf('%s %s -o %s', a:actionType, conf['localpath'], conf['remotepath'])
@@ -85,6 +86,7 @@ function! h:TransferFile(actionType)
         elseif (a:actionType ==# "get") && (conf['confirm_download'] ==# 1)
             let choice = confirm('Download file?', "&Yes\n&No", 2)
         endif
+
         if choice != 1
             echo 'Canceled.'
             return
@@ -92,6 +94,7 @@ function! h:TransferFile(actionType)
 
         execute '!' . cmd
     else
+        " no host, no transfer
         echo 'Could not find .vTransfer config file'
     endif
 endfunction
